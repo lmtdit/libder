@@ -17,14 +17,8 @@
 
 ## 如何使用
 
-### 开发及时调试
+### 初始化
+gulp init
 
-    gulp dev
-
-### 从头打包部署
-
-    gulp
-
-### 提交发布
-
-    gulp publish
+### 进入开发
+gulp 
