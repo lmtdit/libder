@@ -32,15 +32,15 @@ module.exports =
   
   # 源码目录
   imgPath: './img/'
-  jsPath: './js/'
-  lessPath: './js/_less/'
-  tplPath: './js/_tpl/'
-  jsLibPath: './js/vendor/'
+  jsPath: './_src/'
+  lessPath: './_src/_less/'
+  tplPath: './_src/_tpl/'
+  jsLibPath: './_src/vendor/'
   
   # 一个大坑啊。。。
   watchFiles: [
-      './js/**/*.js'
-      './js/_less/**/*.less'
-      './js/_tpl/**/*.html'
+      './_src/**/*.js'
+      './_src/_less/**/*.less'
+      './_src/_tpl/**/*.html'
       '!.DS_Store'
     ]
