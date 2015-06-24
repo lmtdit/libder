@@ -2,7 +2,7 @@
   "name": "lazyload",
   "description": "image lazyload",
   "version": "0.1.0",
-  "main": "js/lazyload.js",
+  "main": "dist/lazyload.js",
   "homepage": "",
   "author": {
     "name": "lmtdit",
@@ -22,18 +22,14 @@
     "node": ">= 0.10.0"
   },
   "devDependencies": {
-    "bluebird": "^2.9.25",
     "gulp": "^3.8.11",
     "gulp-less": "3.0.0",
     "gulp-minify-css": "^1.1.6",
     "gulp-plumber": "1.0.0",
-    "gulp-requirejs": "^0.1.3",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "3.0.4",
     "gulp-watch": "4.1.1",
-    "less": "^2.5.1",
     "lodash": "3.5.0",
-    "uglify-js": "2.4.17",
     "yargs": "^3.10.0"
   },
   "dependencies": {},
