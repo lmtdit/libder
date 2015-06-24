@@ -96,7 +96,7 @@ class jsCtl
     # 将绝对路径转换为AMD模块ID
     madeModId: (filepath)->
         return filepath.replace(/\\/g,'/')
-                       .split('/js/')[1]
+                       .split('/_src/')[1]
                        .replace(/.js$/,'')
 
     # 将相对路径转换为AMD模块ID
@@ -181,7 +181,7 @@ class jsCtl
                 # console.log obj
                 _paths[obj.name] = "dist/#{obj.name}"
                 _source = source
-                _dir = obj.dir.split("/js/")[1]
+                _dir = obj.dir.split("/_src/")[1]
                 _distname = obj.name + obj.ext
                 _dir and (_distname = _dir + '/' + _distname)
                 if _num%20 == 0 and _num > 15
@@ -196,7 +196,7 @@ class jsCtl
     # 合并AMD模块
     combo: (cb)=>
         _baseUrl = './'
-        _main = "js/#{pkg.name}.js"
+        _main = "_src/#{pkg.name}.js"
         _outName = "#{pkg.name}.js"
         rjs
             baseUrl: _baseUrl
