@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <!--允许全屏-->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+    <title>lib-lazyload demo</title>
+    <style>
+    </style>
+    <!-- <link href="build/lazyload.debug.css" rel="stylesheet" type="text/css" /> -->
+</head>
+
+<body>
+    <h1>移动版 lazyload demo</h1>
+    <p>参考 <a href="http://m.shenba.com">m.shenba.com</a> 首页</p>
+    <div class="swipe-wrap">
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=90" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04863120552374905.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=77" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04870967110172425.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=90" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04863120552374905.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=77" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04870967110172425.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=246" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04878754168763109.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=271" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04880286505718935.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=268" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04879553091401559.png" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+        <div class="item">
+            <a href="http://m.shenba.com/product_list.html?special_id=237" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04878820573000960.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
+        </div>
+    </div>
+    <p id="show">show</p>
+    <div style="display: none;" id="hidediv">
+        <img id="test" class="lazy" dataimg="http://img.shenba.com/shop/adv/04878820573000960.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" />
+    </div>
+    <script src="http://m.shenba.com/_src/_js/vendor/require/require.js?_v2.4"></script>
+    <script src="http://m.shenba.com/_src/_js/vendor/Zepto/zepto.js?_v2.4"></script>
+    <script src="./require_cfg.js"></script>
+    <script>
+    require(['lazyload'], function() {
+        console.log(Lib);
+        Lazyload = Lib.Lazyload;
+        Lazyload.init({
+            isNew: true
+        });
+        Lazyload.trigger();
+
+        $("#show").click(function() {
+            $("#hidediv").show();
+            Lazyload.trigger();
+        });
+    });
+    </script>
+</body>
+
+</html>

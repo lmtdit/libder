@@ -1,0 +1,13 @@
+.DS_Store
+.project
+.idea/
+.*.swp
+.*.swo
+._*
+*.mo
+*.po
+*.pot
+.smbdelete*
+*.sublime*
+node_modules
+node_modules/*
