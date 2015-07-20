@@ -1,8 +1,4 @@
 {
-    "paths":{
-        "Zepto":"http://m.shenba.com/_src/_js/vendor/Zepto/zepto.js"
-    },
-    "shim":{
-        
-    }   
+    "paths": {},
+    "shim": {}
 }

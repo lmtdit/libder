@@ -9,5 +9,6 @@
 *.pot
 .smbdelete*
 *.sublime*
+dist/*
 node_modules
 node_modules/*

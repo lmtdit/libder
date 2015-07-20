@@ -53,11 +53,14 @@ gulp.task 'tpl',->
 gulp.task 'js',->
     build.js2dist()
 
+gulp.task 'img',->
+    build.img2dist()
+
 gulp.task 'watch',->
     build.watch()
 
-gulp.task 'default',->
-    build.less2js ->
-        build.tpl2js ->
-            build.js2dist ->
-                gulp.start 'watch'
+gulp.task 'server',->
+    build.server()
+
+gulp.task 'default',['img','less','tpl','js','server'],->
+    gulp.start 'watch'

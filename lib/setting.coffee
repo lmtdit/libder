@@ -10,11 +10,9 @@ path  = require 'path'
 cfg = require '../config.json'
 args   = require('yargs').argv
 
-st_root = process.env.INIT_CWD
+_root = process.env.INIT_CWD
 
 _env = (args.e or args.env) ? 'dev'
-_isDebug = (args.d or args.debug) ? false
-_envs = cfg.envs
 
 
 # 开发环境下，请求静态资源的域名
@@ -24,20 +22,18 @@ module.exports =
   # 开发环境 
   env: _env 
 
-  # 是否开启debug模式
-  isDebug: _isDebug
-
   # 生产目录
+  root: _root
   distPath: './dist/'
   
   # 源码目录
-  imgPath: './img/'
   jsPath: './_src/'
   lessPath: './_src/_less/'
   tplPath: './_src/_tpl/'
+  imgPath: './_src/img/'
   jsLibPath: './_src/vendor/'
   
-  # 一个大坑啊。。。
+  # 监控的文件
   watchFiles: [
       './_src/**/*.js'
       './_src/_less/**/*.less'

@@ -7,10 +7,7 @@ less    = require 'gulp-less'
 mincss  = require 'gulp-minify-css'
 plumber = require 'gulp-plumber'
 watch   = require 'gulp-watch'
-# rjs     = require 'gulp-requirejs'
-# uglify  = require 'gulp-uglify'
-# rename  = require 'gulp-rename'
-# amdclean = require 'amdclean'
+server = require('gulp-server-livereload')
 setting = require './setting'
 color   = gutil.colors
 
@@ -31,22 +28,6 @@ Tools =
             if Tools.mkdirsSync path.dirname(dirpath), mode
                 fs.mkdirSync(dirpath, mode)
                 return true
-    # 合并对象或数组
-    objMixin: _.partialRight _.assign, (a, b) ->
-        val = if (typeof a is 'undefined') then b else a
-        return val
-    # 执行命令
-    exec: (command, callback)->
-        exec command,(error, stdout, stderr)->
-            # console.log(command + ' 执行中...')
-            if stdout
-                console.log('exec stdout: ' + stdout)
-            if stderr
-                console.log('exec stderr: ' + stderr)
-            if error
-                console.log('exec error: ' + error)
-            # console.log(command + ' 执行完毕！')
-            callback and callback() 
     errHandler:(e)->
         gutil.beep()
         gutil.beep()
@@ -62,7 +43,6 @@ Tools =
             .replace(/\n\s+/g, ' ')
             .replace(/\s+/g, ' ')
             .replace(/>([\n\s+]*?)</g,'><')
-
 
 ###
 # js 生产文件处理函数
@@ -236,61 +216,6 @@ build =
             _jsData = "define(function(){\n\tvar Lib = window.Lib || (window.Lib = {});\n\t/*code here*/\n\t\n\tLib.#{_modName}=#{_modName};\n\treturn Lib;\n});"
             fs.writeFileSync _mainFile, _jsData, 'utf8'
         gutil.log color.cyan "#{_modName} init success!"
-        
-    # build less to js
-    less2js: (cb)->
-        _lessPath = setting.lessPath
-        _less = (lessFile,cb)->
-            _source = {}
-            gulp.src(lessFile)
-                .pipe plumber({errorHandler: Tools.errHandler})
-                .pipe less
-                        compress: false
-                .pipe mincss({
-                        keepBreaks:false
-                        compatibility:
-                            properties:
-                                iePrefixHack:true
-                                ieSuffixHack:true
-                    })
-                .on 'data',(output)->
-                    _fileName = path.basename(output.path,'.css')
-                    _source[_fileName] = output.contents.toString()
-                .on 'end',-> 
-                    cb and cb(_source)
-        _files = []
-        fs.readdirSync(_lessPath).forEach (f)->
-            if f.indexOf('.') != 0 and f.indexOf('.less') != -1
-                _lessFile = path.join(_lessPath, f)
-                _files.push _lessFile
-        _less _files,(datas)->
-            css_source = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Css = #{JSON.stringify(datas)};return Lib;});"
-            fs.writeFileSync path.join(setting.jsPath,"#{_modName}Css.js"), css_source, 'utf8'
-            gutil.log 'lessTojs done!'
-            cb and cb()
-
-    # build html tpl to js 
-    tpl2js: (cb)->
-        _htmlMinify = Tools.htmlMinify
-        _tplPath = setting.tplPath
-        tplData = {}
-        fs.readdirSync(_tplPath).forEach (file)->
-            _file_path = path.join(_tplPath, file)
-            if fs.statSync(_file_path).isFile() and file.indexOf('.html') != -1 and file.indexOf('.') != 0
-                _fileName = path.basename(file,'.html')
-                _source = fs.readFileSync(_file_path, 'utf8')
-                # console.log _fileName
-                # 压缩html
-                file_source = Tools.htmlMinify(_source)
-
-                if file.indexOf('_') == 0
-                  tplData[_fileName] = "<script id=\"tpl#{_fileName}\" type=\"text/html\">#{file_source}</script>"
-                else
-                  tplData[_fileName] = file_source
-        tpl_soure = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Tpl = #{JSON.stringify(tplData)};return Lib;});"
-        fs.writeFileSync path.join(setting.jsPath,"#{_modName}Tpl.js"), tpl_soure, 'utf8'
-        gutil.log 'tplTojs done!'
-        cb and cb()
 
     # build paths
     paths:(obj)->
@@ -326,6 +251,83 @@ build =
         require_cfg = "require.config(#{JSON.stringify(rCfg, null, 2)});"
         fs.writeFileSync path.join('.', "require_cfg.js"), require_cfg, 'utf8'
         gutil.log 'require_cfg.js done!'
+        
+    # build less to js
+    less2js: (cb)->
+        _lessPath = setting.lessPath
+        _less = (lessFile,cb)->
+            _source = {}
+            gulp.src(lessFile)
+                .pipe plumber({errorHandler: Tools.errHandler})
+                .pipe less
+                        compress: false
+                .pipe mincss({
+                        keepBreaks:false
+                        compatibility:
+                            properties:
+                                iePrefixHack:true
+                                ieSuffixHack:true
+                    })
+                .pipe gulp.dest(setting.distPath + "css")
+                .on 'data',(output)->
+                    _fileName = path.basename(output.path,'.css')
+                    _contents = output.contents.toString()
+                    cssBgReg = /url\s*\(([^\)]+)\)/g
+                    _contents = _contents.replace cssBgReg, (str,map)->
+                        if map.indexOf('fonts/') isnt -1 or map.indexOf('font/') isnt -1 or map.indexOf('#') isnt -1
+                            return str
+                        else
+                            key = map.replace(/(^\'|\")|(\'|\"$)/g, '')
+                            console.log key
+                            val = if map.indexOf('data:') > -1 or map.indexOf('about:') > -1 then map else key + '?=t' + String(new Date().getTime()).substr(0,8)
+                            console.log val
+                            return str.replace(map, val)
+                    _source[_fileName] = _contents
+                .on 'end',->
+                    cb and cb(_source)
+        _files = []
+        fs.readdirSync(_lessPath).forEach (f)->
+            if f.indexOf('.') != 0 and f.indexOf('.less') != -1
+                _lessFile = path.join(_lessPath, f)
+                _files.push _lessFile
+        _less _files,(datas)->
+            css_source = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Css = #{JSON.stringify(datas)};return Lib;});"
+            fs.writeFileSync path.join(setting.jsPath,"#{_modName}Css.js"), css_source, 'utf8'
+            gutil.log 'lessToCss done!'
+            cb and cb()
+
+    # build html tpl to js 
+    tpl2js: (cb)->
+        _htmlMinify = Tools.htmlMinify
+        _tplPath = setting.tplPath
+        tplData = {}
+        fs.readdirSync(_tplPath).forEach (file)->
+            _file_path = path.join(_tplPath, file)
+            if fs.statSync(_file_path).isFile() and file.indexOf('.html') != -1 and file.indexOf('.') != 0
+                _fileName = path.basename(file,'.html')
+                _source = fs.readFileSync(_file_path, 'utf8')
+                # console.log _fileName
+                # 压缩html
+                file_source = Tools.htmlMinify(_source)
+
+                if file.indexOf('_') == 0
+                  tplData[_fileName] = "<script id=\"tpl#{_fileName}\" type=\"text/html\">#{file_source}</script>"
+                else
+                  tplData[_fileName] = file_source
+        tpl_soure = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Tpl = #{JSON.stringify(tplData)};return Lib;});"
+        fs.writeFileSync path.join(setting.jsPath,"#{_modName}Tpl.js"), tpl_soure, 'utf8'
+        gutil.log 'tplTojs done!'
+        cb and cb()
+
+    # build js to dist dir
+    img2dist:(cb)->
+        _this = @
+        _cb = cb or ->
+        _imgPath = setting.imgPath
+        gulp.src(_imgPath + '*.*')
+            .pipe gulp.dest(setting.distPath + 'img')
+            .on "end",->
+                _cb()
 
     # build js to dist dir
     js2dist:(cb)->
@@ -336,6 +338,7 @@ build =
             _this.paths(_paths)
             _this.cfg(_paths)
             _cb()
+
     _getType:(dir)->
         type = ''
         if dir.indexOf('_tpl') > 0
@@ -345,6 +348,7 @@ build =
         else
             type = 'js'
         return type
+
     watch:->
         _this = @
         _list = []
@@ -373,6 +377,18 @@ build =
                 ,3000
             catch err
                 console.log err 
+
+    server:->
+        appPath = setting.root
+        gulp.src(appPath)
+        .pipe server
+            livereload: false,
+            directoryListing: true,
+            open: true
+            host: 'localhost'
+            port: 8800
+        
+
 exports.setting = setting
 # exports.Tools = Tools
 exports.build = build
