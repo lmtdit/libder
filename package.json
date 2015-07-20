@@ -1,8 +1,8 @@
 {
-  "name": "lazyload",
-  "description": "image lazyload",
+  "name": "libder",
+  "description": "libder",
   "version": "0.1.0",
-  "main": "dist/lazyload.js",
+  "main": "dist/libder.js",
   "homepage": "",
   "author": {
     "name": "lmtdit",
@@ -35,6 +35,6 @@
   "dependencies": {},
   "combo": {},
   "keywords": [
-    "lazyload"
+    "libder"
   ]
 }

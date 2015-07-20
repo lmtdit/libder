@@ -22,6 +22,9 @@ module.exports =
   # 开发环境 
   env: _env 
 
+  # 扩展库的命名空间标志
+  spaceName: "sbLib"
+
   # 生产目录
   root: _root
   distPath: './dist/'
@@ -33,6 +36,7 @@ module.exports =
   imgPath: './_src/img/'
   jsLibPath: './_src/vendor/'
   
+
   # 监控的文件
   watchFiles: [
       './_src/**/*.js'

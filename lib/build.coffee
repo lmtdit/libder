@@ -10,9 +10,11 @@ watch   = require 'gulp-watch'
 server = require('gulp-server-livereload')
 setting = require './setting'
 color   = gutil.colors
-
+# console.log setting.root
 pkg = require('../package.json')
 _modName = pkg.name
+
+_spaceName = setting.spaceName
 ###
 # base functions
 ###
@@ -75,8 +77,9 @@ class jsCtl
 
     # 将绝对路径转换为AMD模块ID
     madeModId: (filepath)->
+        # console.log filepath
         return filepath.replace(/\\/g,'/')
-                       .split('/_src/')[1]
+                       .split("#{_modName}/_src/")[1]
                        .replace(/.js$/,'')
 
     # 将相对路径转换为AMD模块ID
@@ -158,12 +161,9 @@ class jsCtl
         @_stream(
             _file
             (obj,source)->
-                # console.log obj
                 _paths[obj.name] = "dist/#{obj.name}"
                 _source = source
-                _dir = obj.dir.split("/_src/")[1]
-                _distname = obj.name + obj.ext
-                _dir and (_distname = _dir + '/' + _distname)
+                _distname = obj.base
                 if _num%20 == 0 and _num > 15
                     gutil.log 'Building...'
                 _this._buildJs _distname,_source
@@ -172,29 +172,6 @@ class jsCtl
                 gutil.log 'Build success!'
                 _done()
         )
-
-    # 合并AMD模块
-    combo: (cb)=>
-        _baseUrl = './'
-        _main = "_src/#{pkg.name}.js"
-        _outName = "#{pkg.name}.js"
-        rjs
-            baseUrl: _baseUrl
-            name: _main
-            out: _outName
-        
-        .on 'data',(output)->
-            _source = String(output.contents)
-            # console.log _source
-        .pipe gulp.dest('./dist/')
-        .pipe uglify()
-        .pipe rename({
-                suffix: ".min",
-                extname: ".js"
-              })
-        .pipe gulp.dest('./dist/')
-        .on 'end',->
-                cb and cb()
 
 # 构建方法
 build =
@@ -205,15 +182,13 @@ build =
             setting.jsPath
             setting.imgPath
             setting.tplPath
-            # setting.jsLibPath
-            # setting.distPath
         ]
         for _dir in init_dir
             Tools.mkdirsSync _dir
             gutil.log "#{_dir} made success!"
         _mainFile = path.join setting.jsPath,_modName + '.js'
         if !fs.existsSync(_mainFile)
-            _jsData = "define(function(){\n\tvar Lib = window.Lib || (window.Lib = {});\n\t/*code here*/\n\t\n\tLib.#{_modName}=#{_modName};\n\treturn Lib;\n});"
+            _jsData = "define(function(){\n\tvar #{_spaceName} = window.#{_spaceName} || (window.#{_spaceName} = {});\n\t/*code here*/\n\t\n\t#{_spaceName}.#{_modName}=#{_modName};\n\treturn #{_spaceName};\n});"
             fs.writeFileSync _mainFile, _jsData, 'utf8'
         gutil.log color.cyan "#{_modName} init success!"
 
@@ -278,9 +253,9 @@ build =
                             return str
                         else
                             key = map.replace(/(^\'|\")|(\'|\"$)/g, '')
-                            console.log key
+                            # console.log key
                             val = if map.indexOf('data:') > -1 or map.indexOf('about:') > -1 then map else key + '?=t' + String(new Date().getTime()).substr(0,8)
-                            console.log val
+                            # console.log val
                             return str.replace(map, val)
                     _source[_fileName] = _contents
                 .on 'end',->
@@ -291,9 +266,10 @@ build =
                 _lessFile = path.join(_lessPath, f)
                 _files.push _lessFile
         _less _files,(datas)->
-            css_source = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Css = #{JSON.stringify(datas)};return Lib;});"
-            fs.writeFileSync path.join(setting.jsPath,"#{_modName}Css.js"), css_source, 'utf8'
-            gutil.log 'lessToCss done!'
+            if !_.isEmpty(datas)
+                css_source = "define(function(){var #{_spaceName}=window.#{_spaceName}||(window.#{_spaceName}={});#{_spaceName}.#{_modName}Css = #{JSON.stringify(datas)};return #{_spaceName};});"
+                fs.writeFileSync path.join(setting.jsPath,"#{_modName}Css.js"), css_source, 'utf8'
+                gutil.log 'lessToCss done!'
             cb and cb()
 
     # build html tpl to js 
@@ -314,9 +290,10 @@ build =
                   tplData[_fileName] = "<script id=\"tpl#{_fileName}\" type=\"text/html\">#{file_source}</script>"
                 else
                   tplData[_fileName] = file_source
-        tpl_soure = "define(function(){var Lib=window.Lib||(window.Lib={});Lib.#{_modName}Tpl = #{JSON.stringify(tplData)};return Lib;});"
-        fs.writeFileSync path.join(setting.jsPath,"#{_modName}Tpl.js"), tpl_soure, 'utf8'
-        gutil.log 'tplTojs done!'
+        if !_.isEmpty(tplData)
+            tpl_soure = "define(function(){var #{_spaceName}=window.#{_spaceName}||(window.#{_spaceName}={});#{_spaceName}.#{_modName}Tpl = #{JSON.stringify(tplData)};return #{_spaceName};});"
+            fs.writeFileSync path.join(setting.jsPath,"#{_modName}Tpl.js"), tpl_soure, 'utf8'
+            gutil.log 'tplTojs done!'
         cb and cb()
 
     # build js to dist dir
