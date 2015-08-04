@@ -15,53 +15,26 @@
 </head>
 
 <body>
-    <h1>移动版 lazyload demo</h1>
-    <p>参考 <a href="http://m.shenba.com">m.shenba.com</a> 首页</p>
-    <div class="swipe-wrap">
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=90" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04863120552374905.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=77" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04870967110172425.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=90" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04863120552374905.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=77" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04870967110172425.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=246" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04878754168763109.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=271" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04880286505718935.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=268" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04879553091401559.png" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-        <div class="item">
-            <a href="http://m.shenba.com/product_list.html?special_id=237" target="_self"><img class="lazy" dataimg="http://img.shenba.com/shop/adv/04878820573000960.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" alt=""></a>
-        </div>
-    </div>
-    <p id="show">show</p>
-    <div style="display: none;" id="hidediv">
-        <img id="test" class="lazy" dataimg="http://img.shenba.com/shop/adv/04878820573000960.jpg" src="http://pcstatics.shenba.com/assets/img/dot.png" />
-    </div>
-    <script src="http://m.shenba.com/_src/_js/vendor/require/require.js?_v2.4"></script>
-    <script src="http://m.shenba.com/_src/_js/vendor/Zepto/zepto.js?_v2.4"></script>
+    <h1>layer demo</h1>
+    <p style="text-align: center;">API参考 <a href="http://layer.layui.com">http://layer.layui.com</a> layer官网</p>
+    <p style="text-align: center;">
+        <button id="show" style="font-size:18px;">show</button>
+    </p>
+    <script src="http://pcstatics.shenba.com/_src/_js/vendor/require/require.js?_v2.4"></script>
+    <script src="http://pcstatics.shenba.com/_src/_js/vendor/jquery/jquery.js?_v2.4"></script>
     <script src="./require_cfg.js"></script>
     <script>
-    require(['lazyload'], function() {
+    require(['layer'], function() {
         console.log(Lib);
-        Lazyload = Lib.Lazyload;
-        Lazyload.init({
-            isNew: true
+        layer = Lib.layer;
+        layer.config({
+            path: '/dist/' //layer.js所在的目录，可以是绝对目录，也可以是相对目录
         });
-        Lazyload.trigger();
-
         $("#show").click(function() {
-            $("#hidediv").show();
-            Lazyload.trigger();
+            layer.open({
+                title: 'test',
+                content: 'hello layer'
+            });
         });
     });
     </script>

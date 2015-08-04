@@ -1,40 +1,41 @@
 {
-  "name": "libder",
-  "description": "libder",
-  "version": "0.1.0",
-  "main": "dist/libder.js",
-  "homepage": "",
-  "author": {
-    "name": "lmtdit",
-    "email": "lmtdit@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "./LICENSE-MIT"
-    }
-  ],
-  "engines": {
-    "node": ">= 0.10.0"
-  },
-  "devDependencies": {
-    "gulp": "^3.8.11",
-    "gulp-less": "3.0.0",
-    "gulp-minify-css": "^1.1.6",
-    "gulp-plumber": "1.0.0",
-    "gulp-uglify": "^1.2.0",
-    "gulp-util": "3.0.4",
-    "gulp-watch": "4.1.1",
-    "lodash": "3.5.0",
-    "yargs": "^3.10.0"
-  },
-  "dependencies": {},
-  "combo": {},
-  "keywords": [
-    "libder"
-  ]
+    "name": "base64",
+    "description": "这是页面的独立控件。",
+    "version": "0.0.1",
+    "main": "dist/base64.js",
+    "homepage": "",
+    "author": {
+        "name": "lmtdit",
+        "email": "lmtdit@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": ""
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "./LICENSE-MIT"
+        }
+    ],
+    "engines": {
+        "node": ">= 0.10.0"
+    },
+    "devDependencies": {
+        "gulp": "^3.8.11",
+        "gulp-less": "3.0.0",
+        "gulp-minify-css": "^1.1.6",
+        "gulp-plumber": "1.0.0",
+        "gulp-server-livereload": "^1.4.0",
+        "gulp-uglify": "^1.2.0",
+        "gulp-util": "3.0.4",
+        "gulp-watch": "4.1.1",
+        "lodash": "3.5.0",
+        "yargs": "^3.10.0"
+    },
+    "dependencies": {},
+    "combo": {},
+    "keywords": [
+        "base64"
+    ]
 }

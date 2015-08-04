@@ -12,22 +12,30 @@ args   = require('yargs').argv
 
 _root = process.env.INIT_CWD
 
-_env = (args.e or args.env) ? 'dev'
-
+_version = (args.v or args.version) ? '0.0.1'
+_desc    = (args.d or args.desc) ? ''
+_author  = args.author ? 'lmtdit'
+_email   = args.email ? 'lmtdit@gmail.com'
 
 # 开发环境下，请求静态资源的域名
 
 module.exports =
 
-  # 开发环境 
-  env: _env 
+  # 开发环境
+  modName: path.parse(_root).name
+  version: _version
+  desc: _desc
+  author: _author
+  email: _email
 
-  # 扩展库的命名空间标志
-  spaceName: "sbLib"
-
+  # 类库命名空间
+  spaceName: 'sbLib'
+  
+  
   # 生产目录
   root: _root
   distPath: './dist/'
+
   
   # 源码目录
   jsPath: './_src/'
@@ -36,7 +44,6 @@ module.exports =
   imgPath: './_src/img/'
   jsLibPath: './_src/vendor/'
   
-
   # 监控的文件
   watchFiles: [
       './_src/**/*.js'

@@ -7,14 +7,12 @@ less    = require 'gulp-less'
 mincss  = require 'gulp-minify-css'
 plumber = require 'gulp-plumber'
 watch   = require 'gulp-watch'
-server = require('gulp-server-livereload')
+server  = require('gulp-server-livereload')
 setting = require './setting'
 color   = gutil.colors
-# console.log setting.root
-pkg = require('../package.json')
-_modName = pkg.name
-
 _spaceName = setting.spaceName
+_modName   = setting.modName
+
 ###
 # base functions
 ###
@@ -77,7 +75,6 @@ class jsCtl
 
     # 将绝对路径转换为AMD模块ID
     madeModId: (filepath)->
-        # console.log filepath
         return filepath.replace(/\\/g,'/')
                        .split("#{_modName}/_src/")[1]
                        .replace(/.js$/,'')
@@ -163,25 +160,47 @@ class jsCtl
             (obj,source)->
                 _paths[obj.name] = "dist/#{obj.name}"
                 _source = source
-                _distname = obj.base
-                if _num%20 == 0 and _num > 15
-                    gutil.log 'Building...'
+                _dir = obj.dir.split("#{_modName}/_src/")[1]
+                _distname = obj.name + obj.ext
+                _dir and (_distname = _dir + '/' + _distname)
                 _this._buildJs _distname,_source
-                _num++
             ->
                 gutil.log 'Build success!'
                 _done()
         )
+
+    # 合并AMD模块
+    combo: (cb)=>
+        _baseUrl = './'
+        _main = "_src/#{pkg.name}.js"
+        _outName = "#{pkg.name}.js"
+        rjs
+            baseUrl: _baseUrl
+            name: _main
+            out: _outName
+        .on 'data',(output)->
+            _source = String(output.contents)
+        .pipe gulp.dest('./dist/')
+        .pipe uglify()
+        .pipe rename({
+                suffix: ".min",
+                extname: ".js"
+              })
+        .pipe gulp.dest('./dist/')
+        .on 'end',->
+                cb and cb()
 
 # 构建方法
 build =
     # project init
     init: ->
         init_dir = [
-            setting.lessPath
             setting.jsPath
             setting.imgPath
+            setting.lessPath
             setting.tplPath
+            # setting.js#{_spaceName}Path
+            # setting.distPath
         ]
         for _dir in init_dir
             Tools.mkdirsSync _dir
@@ -190,6 +209,22 @@ build =
         if !fs.existsSync(_mainFile)
             _jsData = "define(function(){\n\tvar #{_spaceName} = window.#{_spaceName} || (window.#{_spaceName} = {});\n\t/*code here*/\n\t\n\t#{_spaceName}.#{_modName}=#{_modName};\n\treturn #{_spaceName};\n});"
             fs.writeFileSync _mainFile, _jsData, 'utf8'
+        # 修改package
+        try
+            # ...
+            pkg = require('../package.json')
+            pkg.name = _modName
+            pkg.description = setting.desc
+            pkg.version = setting.version
+            pkg.main = "dist/#{_modName}.js"
+            pkg.author = 
+                name: setting.author
+                email: setting.email
+            pkg.keywords = [_modName]
+            _newPkg = JSON.stringify pkg, null, 4
+            fs.writeFileSync './package.json', _newPkg, 'utf8'
+        catch e
+            # ...
         gutil.log color.cyan "#{_modName} init success!"
 
     # build paths
@@ -265,11 +300,14 @@ build =
             if f.indexOf('.') != 0 and f.indexOf('.less') != -1
                 _lessFile = path.join(_lessPath, f)
                 _files.push _lessFile
-        _less _files,(datas)->
-            if !_.isEmpty(datas)
+        if _files.length > 0
+            _less _files,(datas)->
                 css_source = "define(function(){var #{_spaceName}=window.#{_spaceName}||(window.#{_spaceName}={});#{_spaceName}.#{_modName}Css = #{JSON.stringify(datas)};return #{_spaceName};});"
                 fs.writeFileSync path.join(setting.jsPath,"#{_modName}Css.js"), css_source, 'utf8'
                 gutil.log 'lessToCss done!'
+                cb and cb()
+        else
+            gutil.log 'no less todo!'
             cb and cb()
 
     # build html tpl to js 
@@ -277,9 +315,11 @@ build =
         _htmlMinify = Tools.htmlMinify
         _tplPath = setting.tplPath
         tplData = {}
+        _count = 0
         fs.readdirSync(_tplPath).forEach (file)->
             _file_path = path.join(_tplPath, file)
             if fs.statSync(_file_path).isFile() and file.indexOf('.html') != -1 and file.indexOf('.') != 0
+                _count++
                 _fileName = path.basename(file,'.html')
                 _source = fs.readFileSync(_file_path, 'utf8')
                 # console.log _fileName
@@ -290,10 +330,12 @@ build =
                   tplData[_fileName] = "<script id=\"tpl#{_fileName}\" type=\"text/html\">#{file_source}</script>"
                 else
                   tplData[_fileName] = file_source
-        if !_.isEmpty(tplData)
+        if _count > 0
             tpl_soure = "define(function(){var #{_spaceName}=window.#{_spaceName}||(window.#{_spaceName}={});#{_spaceName}.#{_modName}Tpl = #{JSON.stringify(tplData)};return #{_spaceName};});"
             fs.writeFileSync path.join(setting.jsPath,"#{_modName}Tpl.js"), tpl_soure, 'utf8'
             gutil.log 'tplTojs done!'
+        else
+            gutil.log 'no tpl todo!'
         cb and cb()
 
     # build js to dist dir
@@ -328,7 +370,6 @@ build =
 
     watch:->
         _this = @
-        _list = []
         _watchFiles = setting.watchFiles
         watch _watchFiles,(file)->
             try
@@ -338,7 +379,6 @@ build =
                     _parse = path.parse _file_path
                     # console.log _parse
                     _type = _this._getType(_parse.dir)
-                    _list.push(_type) if _type not in _type
                     switch _type
                         when 'js'
                             new jsCtl().init()
@@ -346,12 +386,6 @@ build =
                             _this.less2js()
                         when 'tpl'
                             _this.tpl2js()
-                # clear watch list after 3 seconds
-                clearTimeout watch_timer if watch_timer
-                watch_timer = setTimeout ->
-                    
-                    _list = []
-                ,3000
             catch err
                 console.log err 
 
