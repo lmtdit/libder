@@ -10,31 +10,32 @@
 
 ## 独立控件的目录结构
 ```javascritp
-./libs
+./widget
     ├── base64
     ├── ...
     ├── layer
         ├── _src // 源码目录
-            ├── _less  // layerCss.js的less源码
-            ├── _tpl // layerTpl.js的html源码
-            ├── img
+            ├── less // layer.css.js的less源码
+            ├── tpl  // layer.tpl.js的html源码
+            ├── img  // 控件依赖的图片资源
             ├── layer.js
-            ├── layerCss.js
-            └── layerTpl.js
+            ├── layer.css.js
+            └── layer.tpl.js
         ├── dist // 生产目录
             ├── img
             ├── layer.js
-            ├── layerCss.js
-            ├── layerTpl.js
+            ├── layer.css.js
+            ├── layer.tpl.js
             └── paths.json
-        ├── lib // 核心的构建方法
         ├── demo.html // 独立控件的演示
-        ├── config.json // requrejs的
+        ├── config.json // 配置文件
         ├── gulpfile.js // gulp启动配置入口文件
         ├── package.json // nodeJS依赖安装的包管理文件
         ├── LICENSE-MIT
         └── README.md
 ```
+
+
 
 ## 安装控件的开发构建环境
 
@@ -53,7 +54,15 @@ npm install
 
 > 关于NPM的知识，请参见[nodejs](http://nodejs.org/);
 
-## Gulp使用说明
+## 使用说明
+
+### 初始化`config.json`配置
+```json
+{
+    "hashLen": 10,
+    "cdnDomain": "tmstatics.xxx.com"
+}
+```
 
 ### 项目初始化
 ```shell
